@@ -1,0 +1,9 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Repozytorium zawierające kod projektu z przedmiotu Metody wirtualizacji. Tematem projektu jest stworzenie aplikacji realizującej funkcję tablicy kanban złożonej z frontendu, backendu oraz konteneryzacji."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.142.4",
+]
