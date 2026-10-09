@@ -17,6 +17,7 @@ Uruchomienie:
 
 ```sh
 cd frontend
+npm install   # wymagane przy pierwszym uruchomieniu
 npm run dev
 ```
 
