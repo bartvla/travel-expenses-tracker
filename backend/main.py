@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="tablica-kanban")
+app = FastAPI(title="travel-expenses-tracker")
 
 
 @app.get("/api/message")
