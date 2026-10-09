@@ -1,5 +1,4 @@
-# tablica-kanban
-
+# travel-expenses-tracker
 
 ## Backend
 Uruchomienie:
