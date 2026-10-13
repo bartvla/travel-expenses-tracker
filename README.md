@@ -1,19 +1,81 @@
 # travel-expenses-tracker
 
+Aplikacja do śledzenia wydatków z podróży: frontend (React) + backend (FastAPI) + baza danych w kontenerze.
+
+## Wymagania
+
+- Docker z wtyczką Compose
+- [uv](https://docs.astral.sh/uv/) — zarządzanie środowiskiem backendu
+- Node.js — frontend
+
+## Konfiguracja
+
+Przed pierwszym uruchomieniem utwórz plik `.env` na podstawie szablonu i ustaw w nim własne hasło:
+
+```sh
+cp .env.example .env
+```
+
+Plik `.env` leży w katalogu głównym repozytorium i jest wczytywany w dwóch miejscach:
+
+- `compose.yaml` podstawia z niego zmienne `POSTGRES_*` do kontenera bazy,
+- `backend/database.py` czyta z niego `DATABASE_URL` (przez `python-dotenv`).
+
+Hasło występuje w `.env` dwa razy — osobno w `POSTGRES_PASSWORD` i wewnątrz `DATABASE_URL`. Obie wartości muszą być identyczne, inaczej backend nie uwierzytelni się w bazie.
+
+`.env` jest w `.gitignore` i nie trafia do repozytorium. Do repozytorium trafia tylko `.env.example`.
+
+## Baza danych
+
+PostgreSQL 17 działa w kontenerze opisanym w `compose.yaml`. Uruchomienie z katalogu głównego repozytorium:
+
+```sh
+docker compose up -d
+```
+
+Sprawdzenie, czy kontener wstał:
+
+```sh
+docker compose ps
+```
+
+Połączenie z bazą z linii poleceń (apostrofy są konieczne — zmienne mają się podstawić w kontenerze, nie na hoście):
+
+```sh
+docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
+Zatrzymanie:
+
+```sh
+docker compose down
+```
+
+Dane bazy przechowuje wolumen `data` i przeżywają `docker compose down`. Żeby skasować bazę razem z zawartością:
+
+```sh
+docker compose down -v
+```
+
+Zmienne `POSTGRES_*` są odczytywane wyłącznie przy pierwszej inicjalizacji wolumenu. Jeśli zmienisz użytkownika lub hasło w `.env` już po utworzeniu bazy, trzeba usunąć wolumen (`docker compose down -v`), a potem postawić kontener na nowo — w przeciwnym razie backend dostanie `password authentication failed`.
+
 ## Backend
-Uruchomienie:
+
+Baza musi być uruchomiona przed startem backendu.
 
 ```sh
 cd backend
 uv run fastapi dev main.py
 ```
 
-Backend korzysta z biblioteki fastapi do tworzenia API. Środowisko jest zarządzane za pomocą narzędzia uv.
+Backend korzysta z FastAPI, a dostęp do bazy realizuje przez SQLAlchemy ORM (sterownik `psycopg`). Środowisko jest zarządzane za pomocą narzędzia uv.
 
-Serwuje endpoint `GET /api/message` na http://127.0.0.1:8000.
+Serwuje na http://127.0.0.1:8000:
+
+- `GET /api/message` — wiadomość testowa dla frontendu,
+- `GET /api/health/db` — zwraca `{"db": "ok"}`, jeśli połączenie z bazą działa.
 
 ## Frontend
-Uruchomienie:
 
 ```sh
 cd frontend
@@ -21,10 +83,9 @@ npm install   # wymagane przy pierwszym uruchomieniu
 npm run dev
 ```
 
-Frontend wykorzystuje typescript + React. Aktualnie wyświetla wiadomość pobraną z backendu.
+Frontend wykorzystuje TypeScript + React. Aktualnie wyświetla wiadomość pobraną z backendu. Żądania `/api/*` są przekierowywane przez proxy Vite na http://127.0.0.1:8000.
 
-Uruchamia się pod adresem: http://localhost:5173/
-
+Uruchamia się pod adresem: http://localhost:5173/
 
 ## Model danych
 
