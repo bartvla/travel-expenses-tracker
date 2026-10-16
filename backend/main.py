@@ -12,7 +12,7 @@ def read_message() -> dict[str, str]:
     return {"message": "Hello from the backend!"}
 
 
-@app.get("/api/health/db")
+@app.get("/api/health")
 def db_health(db: DbSession) -> dict[str,str]:
     db.execute(text("SELECT 1"))
     return {"db": "ok"}

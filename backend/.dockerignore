@@ -1,0 +1,11 @@
+# Lokalne srodowisko wirtualne - zalezne od platformy, tworzone od nowa w obrazie
+.venv/
+
+# Cache Pythona i narzedzi
+__pycache__/
+*.py[cod]
+.mypy_cache/
+
+# Sekrety - zmienne podajemy przez compose, nie przez obraz
+.env
+.env.*
