@@ -4,7 +4,6 @@ WORKDIR /app
 
 ENV UV_NO_DEV=1
 
-
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-install-project
 

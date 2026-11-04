@@ -152,3 +152,19 @@ Kategorie systemowe: transport, nocleg, jedzenie, atrakcje, zakupy, inne.
 - Użytkownik może mieć wiele własnych kategorii (`users.id` → `categories.user_id`).
 - Podróż ma wiele wydatków (`trips.id` → `expenses.trip_id`).
 - Każdy wydatek należy do jednej kategorii (`categories.id` → `expenses.category_id`).
+
+
+
+## wymagania dot. backendu (ujawniane KM1):
+
+- min. 4 endpointy
+    - GET: pojedynczy zasób
+    - GET: lista zasobów
+    - POST
+    - PUT/PATCH lub DELETE
+- format wymiany danych: JSON, udokumentowany w README
+- podstawowa walidacja danych wejściowych, np. kod 400 przy błędnych danych
+- kod 404 dla nieistniejącego zasobu
+- endpoint /health
+- healthcheck w compose korzystający z /health oraz depends_on: condition: service_healthy
+- konfiguracja przez zmienne środowiskowe
