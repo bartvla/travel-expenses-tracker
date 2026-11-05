@@ -3,13 +3,14 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import Annotated
 from database import get_db
+from routers import trips
+
+
 app = FastAPI(title="travel-expenses-tracker")
 
 DbSession = Annotated[Session, Depends(get_db)]
 
-@app.get("/api/message")
-def read_message() -> dict[str, str]:
-    return {"message": "Hello from the backend!"}
+app.include_router(trips.router)
 
 
 @app.get("/api/health")
