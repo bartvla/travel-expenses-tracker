@@ -15,5 +15,6 @@ app.include_router(trips.router)
 
 @app.get("/api/health")
 def db_health(db: DbSession) -> dict[str,str]:
+    """Show if databse is up and running"""
     db.execute(text("SELECT 1"))
     return {"db": "ok"}

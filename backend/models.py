@@ -6,7 +6,6 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
-    Enum,
     ForeignKey,
     Numeric,
     String,
@@ -16,13 +15,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
-
-
-class PaymentMethod(enum.Enum):
-    cash = "cash"
-    card = "card"
-    transfer = "transfer"
-    other = "other"
 
 
 class Trips(Base):
@@ -48,7 +40,6 @@ class Trips(Base):
     expenses: Mapped[list["Expenses"]] = relationship(
         back_populates="trip", cascade="all, delete-orphan"
     )
-
 
 class Expenses(Base):
     __tablename__ = "expenses"

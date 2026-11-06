@@ -49,7 +49,7 @@ def create_trip(payload: schemas.TripCreate, db: DbSession) -> models.Trips:
     trip = models.Trips(**payload.model_dump())
     db.add(trip)
     db.commit()
-    db.refresh(trip)  # dociaga id i created_at nadane przez baze
+    db.refresh(trip)
     return trip
 
 
@@ -66,9 +66,10 @@ def replace_trip(
     return trip
 
 
-@router.delete("/{trip_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{trip_id}", status_code=200)
 def delete_trip(trip_id: int, db: DbSession) -> None:
     """DELETE zasob. Wydatki znikaja kaskadowo (ondelete=CASCADE)."""
     trip = get_trip_or_404(trip_id, db)
     db.delete(trip)
     db.commit()
+    return {"Succesfully deleted ID": trip_id}
