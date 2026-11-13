@@ -139,3 +139,17 @@ uv run python reset_db.py
 - endpoint /health
 - healthcheck w compose korzystający z /health oraz depends_on: condition: service_healthy
 - konfiguracja przez zmienne środowiskowe
+
+## wymagania dot. bazy danych (ujawniane KM2):
+
+- gotowy oficjalny obraz, np. : postgres, mysql, mongo
+- dane trwałe na nazwanym wolumenie
+- minimum dwie powiązane tabele lub kolekcje
+- skrypt inicjalizujący: schemat i dane startowe
+- brak opublikowanego portu; baza dostępna dla backend przez sieć compose
+
+## wymagania dot. frontendu (ujawniane KM2):
+
+- min. dwa ekrany / widoki
+- komunikacja wyłącznie z API backendu
+- własny Dockerfile (nie tylko bind mount)
