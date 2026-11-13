@@ -1,10 +1,162 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  color: #000;
+  background: #fff;
+}
+
+/* Pasek gorny: nazwa aplikacji po lewej, akcja po prawej. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #000;
+}
+
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 main {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.45rem 0.9rem;
+  color: #fff;
+  background: #000;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  color: #000;
+  background: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button-ghost {
+  color: #000;
+  background: #fff;
+}
+
+.button-ghost:hover {
+  color: #fff;
+  background: #000;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border: 1px solid #000;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.form-row label {
+  flex: 1;
+}
+
+input,
+textarea {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  padding: 1rem;
+  border: 1px solid #000;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.budget {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.notes {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+}
+
+.muted {
+  color: #555;
+}
+
+.error {
+  margin: 0;
+  color: #000;
+  font-size: 0.85rem;
+  border-left: 3px solid #000;
+  padding-left: 0.6rem;
 }

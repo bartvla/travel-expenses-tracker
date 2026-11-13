@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -22,18 +22,9 @@ def get_trip_or_404(trip_id: int, db: Session) -> models.Trips:
 
 
 @router.get("", response_model=list[schemas.TripRead])
-def list_trips(
-    db: DbSession,
-    limit: Annotated[int, Query(ge=1, le=100)] = 50,
-    offset: Annotated[int, Query(ge=0)] = 0,
-) -> list[models.Trips]:
+def list_trips(db: DbSession) -> list[models.Trips]:
     """GET lista zasobow, z paginacja."""
-    stmt = (
-        select(models.Trips)
-        .order_by(models.Trips.start_date.desc())
-        .limit(limit)
-        .offset(offset)
-    )
+    stmt = select(models.Trips).order_by(models.Trips.start_date.desc())
     return list(db.scalars(stmt))
 
 
@@ -67,7 +58,7 @@ def replace_trip(
 
 
 @router.delete("/{trip_id}", status_code=200)
-def delete_trip(trip_id: int, db: DbSession) -> None:
+def delete_trip(trip_id: int, db: DbSession) -> dict[str, int]:
     """DELETE zasob. Wydatki znikaja kaskadowo (ondelete=CASCADE)."""
     trip = get_trip_or_404(trip_id, db)
     db.delete(trip)
