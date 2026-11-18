@@ -3,7 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import Annotated
 from database import get_db
-from routers import trips
+from routers import trips, expenses
 
 
 app = FastAPI(title="travel-expenses-tracker")
@@ -11,7 +11,7 @@ app = FastAPI(title="travel-expenses-tracker")
 DbSession = Annotated[Session, Depends(get_db)]
 
 app.include_router(trips.router)
-
+app.include_router(expenses.router)
 
 @app.get("/api/health")
 def db_health(db: DbSession) -> dict[str,str]:
