@@ -37,3 +37,22 @@ class TripRead(BaseModel):
     budget: Decimal | None
     notes: str | None
     created_at: datetime
+
+class ExpenseCreate(BaseModel):
+    """Dane przyjmowane w POST /api/trips/{trip_id}/expenses oraz PUT /api/expenses/{expense_id}."""
+
+    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+    spent_on: date
+    description: str | None = Field(default=None, max_length=255)
+
+class ExpenseRead(BaseModel):
+    """Dane wydatku zwracane przez API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    trip_id: int
+    amount: Decimal
+    spent_on: date
+    description: str | None
+    created_at: datetime
