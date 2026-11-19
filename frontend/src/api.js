@@ -43,3 +43,14 @@ export function createTrip(payload) {
     body: JSON.stringify(payload),
   })
 }
+
+export function listExpenses(tripId) {
+  return request(`/trips/${tripId}/expenses`)
+}
+
+export function createExpense(tripId, payload) {
+  return request(`/trips/${tripId}/expenses`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}

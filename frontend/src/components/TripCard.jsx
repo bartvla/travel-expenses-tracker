@@ -1,11 +1,15 @@
-/** Jedna podroz na liscie. Pola opcjonalne pomijamy, gdy sa puste. */
-function TripCard({ trip }) {
+/** Jedna podroz na liscie. Klikniecie otwiera jej wydatki. */
+function TripCard({ trip, onSelect }) {
   const dates = trip.end_date
     ? `${trip.start_date} - ${trip.end_date}`
     : `od ${trip.start_date}`
 
   return (
-    <li className="card">
+    <li
+      className="card"
+      onClick={() => onSelect(trip)}
+      style={{ cursor: 'pointer' }}
+    >
       <div className="card-head">
         <h2>{trip.name}</h2>
         {trip.budget !== null && (
