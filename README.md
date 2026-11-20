@@ -119,7 +119,17 @@ Aplikacja jest jednoosobowa — nie ma kont użytkowników ani logowania. Kwoty 
 
 - Podróż ma wiele wydatków (`trips.id` → `expenses.trip_id`). Usunięcie podróży usuwa jej wydatki.
 
-Odtworzenie schematu od zera (kasuje wszystkie dane):
+### Skrypt inicjalizujący
+
+`backend/reset_db.py` odtwarza schemat od zera i wstawia dane startowe: pięć podróży wraz z ich wydatkami (11 rekordów w `expenses`). **Kasuje wszystkie dane** — tabele są najpierw usuwane, a potem tworzone na nowo.
+
+Uruchomienie w kontenerze backendu (baza nie ma opublikowanego portu, więc z hosta jest nieosiągalna):
+
+```sh
+docker compose exec backend python reset_db.py
+```
+
+Uruchomienie lokalnie, poza Dockerem — wymaga bazy dostępnej pod adresem z `DATABASE_URL`:
 
 ```sh
 cd backend
