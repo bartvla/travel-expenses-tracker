@@ -1,6 +1,10 @@
+import json
+import os
 from typing import Annotated
 
+import redis
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,6 +16,12 @@ router = APIRouter(prefix="/api/trips", tags=["trips"])
 
 DbSession = Annotated[Session, Depends(get_db)]
 
+cache = redis.Redis.from_url(
+    os.getenv("REDIS_URL", "redis://redis:6379/0"),
+    decode_responses=True,
+)
+CACHE_KEY = "trips:all"
+
 
 def get_trip_or_404(trip_id: int, db: Session) -> models.Trips:
     """Wspolny lookup dla endpointow operujacych na jednej podrozy."""
@@ -22,10 +32,20 @@ def get_trip_or_404(trip_id: int, db: Session) -> models.Trips:
 
 
 @router.get("", response_model=list[schemas.TripRead])
-def list_trips(db: DbSession) -> list[models.Trips]:
-    """GET lista zasobow, z paginacja."""
+def list_trips(db: DbSession):
+    """GET lista zasobow z cache'owaniem w Redisie."""
+    cached = cache.get(CACHE_KEY)
+    if cached:
+        print("CACHE HIT (Redis)")
+        return json.loads(cached)
+
+    print("CACHE MISS (PostgreSQL)")
     stmt = select(models.Trips).order_by(models.Trips.start_date.desc())
-    return list(db.scalars(stmt))
+    trips = list(db.scalars(stmt))
+
+    data = jsonable_encoder(trips)
+    cache.set(CACHE_KEY, json.dumps(data), ex=60)
+    return data
 
 
 @router.get("/{trip_id}", response_model=schemas.TripRead)
@@ -41,6 +61,7 @@ def create_trip(payload: schemas.TripCreate, db: DbSession) -> models.Trips:
     db.add(trip)
     db.commit()
     db.refresh(trip)
+    cache.delete(CACHE_KEY)
     return trip
 
 
@@ -54,6 +75,7 @@ def replace_trip(
         setattr(trip, field, value)
     db.commit()
     db.refresh(trip)
+    cache.delete(CACHE_KEY)
     return trip
 
 
@@ -63,4 +85,5 @@ def delete_trip(trip_id: int, db: DbSession) -> dict[str, int]:
     trip = get_trip_or_404(trip_id, db)
     db.delete(trip)
     db.commit()
+    cache.delete(CACHE_KEY)
     return {"Succesfully deleted ID": trip_id}
