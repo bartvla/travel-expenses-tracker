@@ -1,0 +1,12 @@
+# Zrodlo danych wczytywane automatycznie przy starcie Grafany.
+# Dzieki temu po "docker compose up -d" nie trzeba niczego klikac w UI.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus          # na ten uid powoluja sie panele w dashboardzie
+    access: proxy            # Grafana pyta Prometheusa po stronie serwera
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false

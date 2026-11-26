@@ -1,0 +1,11 @@
+# Wskazuje Grafanie katalog, z ktorego ma wczytywac dashboardy zapisane jako JSON.
+apiVersion: 1
+
+providers:
+  - name: travel-expenses
+    type: file
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false
