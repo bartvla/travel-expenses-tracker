@@ -46,11 +46,17 @@ Adresy po uruchomieniu:
 
 | Usługa | Adres |
 |---|---|
-| Frontend | http://localhost:5173 |
-| API | http://localhost:8000 |
-| Interaktywna dokumentacja API | http://localhost:8000/docs |
+| Frontend | http://localhost:8080 |
+| API | http://localhost:8080/api |
 | Grafana | http://localhost:3000 |
 | Prometheus | http://localhost:9090 |
+
+Backend nie publikuje już portu na hosta — ruch do API idzie przez nginx w kontenerze frontendu, który przekazuje dalej tylko ścieżki `/api/`. Oznacza to, że `/docs` i `/metrics` **nie są osiągalne z przeglądarki**. Żeby się do nich dostać, trzeba albo dopisać ich lokalizacje w `frontend/nginx.conf`, albo tymczasowo odsłonić port backendu, dodając w `compose.yaml` do usługi `backend`:
+
+```yaml
+    ports:
+      - "8000:8000"
+```
 
 Baza nie publikuje portu na hosta — jest dostępna wyłącznie dla backendu, przez wewnętrzną sieć compose `backend-net`.
 
@@ -103,13 +109,13 @@ Pełna lista endpointów w sekcji [API](#api).
 
 Frontend to React (JavaScript, pliki `.jsx`) budowany Vite. Ma dwa ekrany: listę podróży i szczegóły wybranej podróży z jej wydatkami. Dane pobiera wyłącznie z API backendu, przez funkcje w `src/api.js`.
 
-Żądania `/api/*` przechodzą przez proxy Vite na `http://backend:8000` (`vite.config.js`). Nazwa `backend` rozwiązuje się tylko wewnątrz sieci compose, dlatego **frontend uruchamia się przez Dockera**, razem z resztą stacku:
+W kontenerze obraz budowany jest dwuetapowo (`frontend/dockerfile`): najpierw `npm run build`, potem gotowe pliki trafiają do nginx. Nginx serwuje statyczny build i przekazuje żądania `/api/` na `http://backend:8000` (`frontend/nginx.conf`) — to on, a nie Vite, jest proxy w działającym stacku.
 
 ```sh
 docker compose up -d
 ```
 
-Serwuje pod http://localhost:5173/.
+Serwuje pod http://localhost:8080/.
 
 Uruchomienie przez `npm run dev` na hoście postawi serwer deweloperski, ale każde żądanie do API padnie — proxy nie znajdzie hosta `backend`. Żeby pracować tak nad frontendem, trzeba najpierw zmienić `target` proxy w `vite.config.js` na `http://127.0.0.1:8000` i uruchomić backend lokalnie.
 
@@ -165,7 +171,7 @@ uv run python reset_db.py
 
 ## API
 
-Formatem wymiany danych jest **JSON** — zarówno w ciele żądania, jak i w odpowiedzi. Żądania z ciałem wymagają nagłówka `Content-Type: application/json`. Interaktywna dokumentacja (OpenAPI) jest pod http://localhost:8000/docs.
+Formatem wymiany danych jest **JSON** — zarówno w ciele żądania, jak i w odpowiedzi. Żądania z ciałem wymagają nagłówka `Content-Type: application/json`. Interaktywna dokumentacja (OpenAPI) jest pod `/docs`, ale backend nie publikuje portu na hosta i nginx nie przekazuje tej sciezki - patrz uwaga w sekcji [Uruchomienie](#uruchomienie).
 
 Wszystkie ścieżki mają prefiks `/api`.
 
@@ -201,7 +207,7 @@ Granice koszyków histogramu ustawia `LATENCY_BUCKETS` w `backend/metrics.py`. D
 Podgląd surowych metryk:
 
 ```sh
-curl -s localhost:8000/metrics | head -40
+docker compose exec prometheus wget -qO- http://backend:8000/metrics | head -40
 ```
 
 ### Panele dashboardu
@@ -216,7 +222,7 @@ Dashboard **Travel Expenses – backend** jest dostępny w Grafanie od razu po s
 Świeżo uruchomiony dashboard jest pusty, bo `rate()` potrzebuje co najmniej dwóch odczytów w oknie czasowym. Żeby zobaczyć dane, trzeba wygenerować ruch i odczekać kilkanaście sekund:
 
 ```sh
-for i in $(seq 1 200); do curl -s -o /dev/null localhost:8000/api/trips; sleep 0.3; done
+for i in $(seq 1 200); do curl -s -o /dev/null localhost:8080/api/trips; sleep 0.3; done
 ```
 
 ## wymagania dot. backendu (ujawniane KM1):

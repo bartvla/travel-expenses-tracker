@@ -14,13 +14,12 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 2s
+
   backend:
     build: ./backend
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-    ports:
-      - "8000:8000"
     networks:
       - frontend-net
       - backend-net
@@ -31,14 +30,18 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/api/health')"]
       interval: 5s
+
   frontend:
     build: ./frontend
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "8080:80"
     depends_on:
       - backend
     networks:
       - frontend-net
+
+  # Zbiera metryki, odpytujac backend:8000/metrics co 10 s (model pull).
   prometheus:
     image: prom/prometheus:v3.8.0
     restart: unless-stopped
